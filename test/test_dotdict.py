@@ -1,7 +1,31 @@
 import pytest
 
+from durable_dot_dict.collection import first
 from durable_dot_dict.dotdict import DotDict
 
+
+def test_first():
+    a1 = {}
+    a2 = {"b": 1}
+    data = DotDict({})
+    data['a'] = first(lambda: a1["a"], lambda: a2["b"])
+    assert data == {'a': 1}
+
+def test_map_key_value():
+    data = DotDict()
+    data << [
+        ('a', 1),
+        ('b.c', 2)
+    ]
+    assert data == {'a': 1, 'b': {'c': 2}}
+
+    assert DotDict() << [('a', 1), ('b.c', 2)] == {'a': 1, 'b': {'c': 2}}
+
+    dot = DotDict() << [('a', 1), ('b.c', 2)]
+    assert dot >> [
+        ("a", 'a'),
+        ("b_c", 'b.c')
+    ] == {'a': 1, 'b_c': 2}
 
 def test_dotdict_deep_set():
     data = DotDict({})

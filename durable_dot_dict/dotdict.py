@@ -1,12 +1,14 @@
 import copy
 import json
-from typing import Union, List
+from typing import Union, List, Tuple, Any, Optional
 from collections.abc import MutableMapping
 import dotdict_parser
 
 
 class DotDict(MutableMapping):
-    def __init__(self, dictionary: Union[dict | list]):
+    def __init__(self, dictionary: Optional[Union[dict | list]] = None):
+        if dictionary is None:
+            dictionary = {}
         if not isinstance(dictionary, (dict, list)):
             raise TypeError(f"Expected dictionary or list as DotDict. Got {type(dictionary)}.")
         self.root = dictionary
@@ -218,3 +220,15 @@ class DotDict(MutableMapping):
             return other == self.to_dict()
         else:
             return False
+
+    def __lshift__(self, list_of_kv: List[Tuple[str, Any]]) -> 'DotDict':
+        for key, value in list_of_kv:
+            self[key] = value
+
+        return self
+
+    def __rshift__(self, list_of_kv: List[Tuple[str, str]]) -> 'DotDict':
+        dot = DotDict()
+        for key, value in list_of_kv:
+            dot[key] = self[value]
+        return dot
