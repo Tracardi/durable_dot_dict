@@ -159,7 +159,12 @@ class DotDict(MutableMapping):
     #         return getattr(self.root, item)
 
     def empty(self, key) -> bool:
-        return self.get(key, None) is None
+        result = self.get(key, None)
+
+        if isinstance(result, (bool, int, float)):
+            return False
+
+        return result is None or not bool(result)
 
     def __contains__(self, item):
         keys = dotdict_parser.parse_unified_path(item)

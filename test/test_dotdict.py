@@ -6,12 +6,23 @@ from durable_dot_dict.dotdict import DotDict
 def test_none():
     data = DotDict({
         "b": None,
-        'c': 1
+        'c': 1,
+        'd': "",
+        'e': {},
+        'f': []
     })
 
+    assert bool(data)
     assert data.empty('a')
+    assert data.empty('a.c')
     assert data.empty('b')
     assert not data.empty('c')
+    assert data.empty('d')
+    assert data.empty('e')
+    assert data.empty('f')
+
+
+    assert not bool(DotDict())
 
 def test_first():
     a1 = {}
