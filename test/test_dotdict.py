@@ -3,6 +3,15 @@ import pytest
 from durable_dot_dict.collection import first
 from durable_dot_dict.dotdict import DotDict
 
+def test_none():
+    data = DotDict({
+        "b": None,
+        'c': 1
+    })
+
+    assert data.empty('a')
+    assert data.empty('b')
+    assert not data.empty('c')
 
 def test_first():
     a1 = {}

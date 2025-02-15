@@ -158,6 +158,9 @@ class DotDict(MutableMapping):
     #     except TypeError:
     #         return getattr(self.root, item)
 
+    def empty(self, key) -> bool:
+        return self.get(key, None) is None
+
     def __contains__(self, item):
         keys = dotdict_parser.parse_unified_path(item)
         return self._has_reference(keys)
