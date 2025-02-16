@@ -77,15 +77,6 @@ class DotDict(MutableMapping):
                 if not isinstance(data, list):
                     data = []
                 data[item] = []
-                # if not isinstance(data, list) and item == 0:
-                #     data = [{}]
-                #     data = data[item]
-                #     continue
-                #
-                # if len(data) >= item:
-                #     raise ValueError(f"Cannot set value to {item} in {path}. Position {item} out of range. List has only {len(data)} items.")
-                # else:
-                #     data[item] = {}
             elif isinstance(item, str):
                 if item not in data:
                     data[item] = {}
@@ -152,12 +143,6 @@ class DotDict(MutableMapping):
     def as_list(data: List[dict]) -> List['DotDict']:
         return list(map(DotDict, data))
 
-    # def __getattr__(self, item) -> 'DotDict':
-    #     try:
-    #         return DotDict(self.root[item])
-    #     except TypeError:
-    #         return getattr(self.root, item)
-
     def empty(self, key) -> bool:
         result = self.get(key, None)
 
@@ -177,18 +162,7 @@ class DotDict(MutableMapping):
 
     def __setitem__(self, key, value):
         keys = dotdict_parser.parse_unified_path(key)
-        # path, key = self._path_key(keys)
         self._set_path_value(keys, value)
-        # _pointer = self._set_reference(path, key)
-        # try:
-        #     if isinstance(value, DotDict):
-        #         value = value.to_dict()
-        #     if isinstance(key, int) and not isinstance(_pointer, list) and key == 0:
-        #         _pointer = [value]
-        #     elif isinstance(key, (str, int)):
-        #         _pointer[key] = value
-        # except Exception as e:
-        #     raise KeyError(f"Error at path {path} for key {key}: {str(e)}")
 
     def __delitem__(self, key):
         if isinstance(key, int):
