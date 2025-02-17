@@ -154,6 +154,9 @@ class DotDict(MutableMapping):
 
         return result is None or not bool(result)
 
+    def flat(self):
+        return dotdict_parser.flatten(self.root)
+
     def __contains__(self, item):
         keys = dotdict_parser.parse_unified_path(item)
         return self._has_reference(keys)

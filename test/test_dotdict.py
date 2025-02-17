@@ -3,6 +3,21 @@ import pytest
 from durable_dot_dict.collection import first
 from durable_dot_dict.dotdict import DotDict
 
+
+def test_flat():
+    data = DotDict({
+        "b.a": None,
+        'c.a': 1,
+        'd.a': "",
+        'e.a': {"b": 1},
+        'f.a': [{"a": 1}, 1],
+        "list": [1],
+        "set": set()
+    }) << [
+        ('list[1]', 2)
+    ]
+    assert data.flat() == {'b.a': None, 'c.a': 1, 'd.a': '', 'e.a.b': 1, 'f.a': [{'a': 1}, 1], 'list': [1, 2], "set": set()}
+
 def test_none():
     data = DotDict({
         "b": None,
