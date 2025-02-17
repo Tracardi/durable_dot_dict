@@ -161,7 +161,7 @@ class DotDict(MutableMapping):
         return Mapper(self, right)
 
     def __setattr__(self, key, value):
-        if not key.starstwith('_'):
+        if not key.startswith('_'):
             raise KeyError(f"Attribute `{key}` can not be set. DotDict can not be modified by setting attributes.")
         super().__setattr__(key, value)
 
