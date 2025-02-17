@@ -1,6 +1,6 @@
 import copy
 import json
-from typing import Union, List, Tuple, Any, Optional, Dict
+from typing import Union, List, Tuple, Any, Optional, Dict, Set
 from collections.abc import MutableMapping
 import dotdict_parser
 
@@ -226,6 +226,11 @@ class DotDict(MutableMapping):
             dot[key] = self[value]
         return dot
 
+def _data_convert(list_of_left_right):
+    if isinstance(list_of_left_right, set):
+        return [(item, item) for item in list_of_left_right]
+    return list_of_left_right.items() if isinstance(list_of_left_right, dict) else list_of_left_right
+
 
 class Mapper:
 
@@ -233,16 +238,16 @@ class Mapper:
         self.left = left
         self.right: DotDict = DotDict(right) if isinstance(right, dict) else right
 
-    def __lshift__(self, list_of_left_right: Union[List[Tuple[str, str]], Dict[str, str]]) -> 'DotDict':
-        list_of_left_right = list_of_left_right.items() if isinstance(list_of_left_right, dict) else list_of_left_right
+    def __lshift__(self, list_of_left_right: Union[List[Tuple[str, str]], Dict[str, str], Set[str]]) -> 'DotDict':
+        list_of_left_right = _data_convert(list_of_left_right)
         for left, right in list_of_left_right:
             if right in self.right:
                 self.left[left] = self.right[right]
 
         return self.left
 
-    def __rshift__(self, list_of_left_right: Union[List[Tuple[str, str]], Dict[str, str]]) -> 'DotDict':
-        list_of_left_right = list_of_left_right.items() if isinstance(list_of_left_right, dict) else list_of_left_right
+    def __rshift__(self, list_of_left_right: Union[List[Tuple[str, str]], Dict[str, str], Set[str]]) -> 'DotDict':
+        list_of_left_right = _data_convert(list_of_left_right)
         for left, right in list_of_left_right:
             if left in self.left:
                 self.right[right] = self.left[left]

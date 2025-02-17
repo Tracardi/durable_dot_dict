@@ -49,6 +49,7 @@ def test_mapper_left2():
     assert Dot(data).b.a == "test"
     assert Dot(data).d.a == ""
 
+
 def test_mapper_right1():
     data = DotDict() << {
         "b.a": None,
@@ -65,3 +66,23 @@ def test_mapper_right1():
     new_value = data.map({"ala_ma_kota": "test"}) >> [('none', 'a'), ('b', 'b'), ('c.a', 'c')]
 
     assert new_value == {'ala_ma_kota': 'test', 'b': {'a': None}, 'c': 1}
+
+
+def test_mapper_right2():
+    data = DotDict() << {
+        "b.a": None,
+        'c.a': 1,
+        'd.a': "",
+        'e.a': {"b": 1},
+        'f.a': [{"a": 1}, 1],
+        "list": [1],
+        "set": set()
+    }
+
+    assert Dot(data).b.a is None
+
+    # Use set to map
+
+    new_value = data.map({"ala_ma_kota": "test"}) >> {"b.a", "c.a"}
+
+    assert new_value == {'ala_ma_kota': 'test', 'b': {'a': None}, 'c': {"a": 1}}

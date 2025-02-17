@@ -7,7 +7,7 @@ with open("README.md", "r",encoding="utf-8") as fh:
 
 setup(
     name='durable_dot_dict',
-    version='0.0.5',
+    version='0.0.6',
     description='Durable Dot Dictionary',
     long_description=long_description,
     long_description_content_type="text/markdown",
