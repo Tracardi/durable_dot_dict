@@ -11,15 +11,15 @@ class DotDict(MutableMapping):
             dictionary = {}
         if not isinstance(dictionary, (dict, list)):
             raise TypeError(f"Expected dictionary or list as DotDict. Got {type(dictionary)}.")
-        self.root = dictionary
+        self._root = dictionary
 
     def _set_path_value(self, path, value):
         """
-        Walks through `root` (which should be a dict or list at the top level),
+        Walks through `_root` (which should be a dict or list at the top level),
         creating intermediate dicts/lists as needed so that each element in `path`
         is valid. The final element of `path` will be set to `value`.
         """
-        node = self.root
+        node = self._root
 
         for i in range(len(path) - 1):
             key = path[i]
@@ -69,7 +69,7 @@ class DotDict(MutableMapping):
             raise TypeError(f"Keys must be str or int, got {type(last_key)}")
 
     def _set_reference(self, path, key):
-        data = self.root
+        data = self._root
         print(path)
         for item_no, item in enumerate(path):
             print(item)
@@ -86,7 +86,7 @@ class DotDict(MutableMapping):
         return data
 
     def _has_reference(self, keys) -> bool:
-        data = self.root
+        data = self._root
         last = len(keys) - 1
         for pos, key in enumerate(keys):
             if isinstance(key, int):
@@ -107,7 +107,7 @@ class DotDict(MutableMapping):
         return True
 
     def _reference(self, keys):
-        data = self.root
+        data = self._root
         for key in keys:
             data = data[key]
         return data
@@ -128,16 +128,16 @@ class DotDict(MutableMapping):
             raise KeyError(f"Could not get DotDict value for {key}. Default value: {args}. Details: {str(e)}")
 
     def copy(self):
-        return DotDict(self.root.copy())
+        return DotDict(self._root.copy())
 
     def deep_copy(self):
-        return DotDict(copy.deepcopy(self.root))
+        return DotDict(copy.deepcopy(self._root))
 
     def to_dict(self) -> dict:
-        return self.root
+        return self._root
 
     def to_json(self, default=None, cls=None):
-        return json.dumps(self.root, default=default, cls=cls)
+        return json.dumps(self._root, default=default, cls=cls)
 
     @staticmethod
     def as_list(data: List[dict]) -> List['DotDict']:
@@ -155,13 +155,13 @@ class DotDict(MutableMapping):
         return result is None or not bool(result)
 
     def flat(self):
-        return dotdict_parser.flatten(self.root)
+        return dotdict_parser.flatten(self._root)
 
     def map(self, right: Union['DotDict', dict]) -> 'Mapper':
         return Mapper(self, right)
 
     def __setattr__(self, key, value):
-        if key != 'root':
+        if not key.starstwith('_'):
             raise KeyError(f"Attribute `{key}` can not be set. DotDict can not be modified by setting attributes.")
         super().__setattr__(key, value)
 
@@ -171,7 +171,7 @@ class DotDict(MutableMapping):
 
     def __getitem__(self, item):
         if isinstance(item, int):
-            return self.root[item]
+            return self._root[item]
         return self.get(item)
 
     def __setitem__(self, key, value):
@@ -180,7 +180,7 @@ class DotDict(MutableMapping):
 
     def __delitem__(self, key):
         if isinstance(key, int):
-            del self.root[key]
+            del self._root[key]
         else:
             keys = dotdict_parser.parse_unified_path(key)
             path, key = self._path_key(keys)
@@ -188,26 +188,26 @@ class DotDict(MutableMapping):
             del data[key]
 
     def __repr__(self):
-        return f'{self.__class__}({self.root})'
+        return f'{self.__class__}({self._root})'
 
     def __str__(self):
-        return self.root.__str__()
+        return self._root.__str__()
 
     def __hash__(self):
-        return self.root.__hash__()
+        return self._root.__hash__()
 
     def __len__(self):
-        return self.root.__len__()
+        return self._root.__len__()
 
     def __getstate__(self):
-        return self.root
+        return self._root
 
     def __setstate__(self, state):
-        self.root = state
+        self._root = state
 
     def __iter__(self):
         # Return an iterator over the keys
-        return self.root.__iter__()
+        return self._root.__iter__()
 
     def __eq__(self, other):
         if isinstance(other, DotDict):
