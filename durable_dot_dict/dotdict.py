@@ -1,6 +1,6 @@
 import copy
 import json
-from typing import Union, List, Tuple, Any, Optional
+from typing import Union, List, Tuple, Any, Optional, Dict
 from collections.abc import MutableMapping
 import dotdict_parser
 
@@ -157,6 +157,9 @@ class DotDict(MutableMapping):
     def flat(self):
         return dotdict_parser.flatten(self.root)
 
+    def map(self, right: Union['DotDict', dict]) -> 'Mapper':
+        return Mapper(self, right)
+
     def __contains__(self, item):
         keys = dotdict_parser.parse_unified_path(item)
         return self._has_reference(keys)
@@ -209,7 +212,9 @@ class DotDict(MutableMapping):
         else:
             return False
 
-    def __lshift__(self, list_of_kv: List[Tuple[str, Any]]) -> 'DotDict':
+    def __lshift__(self, list_of_kv) -> 'DotDict':
+        list_of_kv = list_of_kv.items() if isinstance(list_of_kv, dict) else list_of_kv
+
         for key, value in list_of_kv:
             self[key] = value
 
@@ -220,3 +225,25 @@ class DotDict(MutableMapping):
         for key, value in list_of_kv:
             dot[key] = self[value]
         return dot
+
+
+class Mapper:
+
+    def __init__(self, left: DotDict, right: Union[DotDict, dict]):
+        self.left = left
+        self.right: DotDict = DotDict(right) if isinstance(right, dict) else right
+
+    def __lshift__(self, list_of_left_right: Union[List[Tuple[str, str]], Dict[str, str]]) -> 'DotDict':
+        list_of_left_right = list_of_left_right.items() if isinstance(list_of_left_right, dict) else list_of_left_right
+        for left, right in list_of_left_right:
+            if right in self.right:
+                self.left[left] = self.right[right]
+
+        return self.left
+
+    def __rshift__(self, list_of_left_right: Union[List[Tuple[str, str]], Dict[str, str]]) -> 'DotDict':
+        list_of_left_right = list_of_left_right.items() if isinstance(list_of_left_right, dict) else list_of_left_right
+        for left, right in list_of_left_right:
+            if left in self.left:
+                self.right[right] = self.left[left]
+        return self.right

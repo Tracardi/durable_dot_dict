@@ -20,3 +20,4 @@ def first_not_none(*args: Callable[[], Any]) -> Any:
         except Exception:
             continue
     raise ValueError("All provided callables failed.")
+

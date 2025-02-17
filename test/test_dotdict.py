@@ -4,6 +4,46 @@ from durable_dot_dict.collection import first
 from durable_dot_dict.dotdict import DotDict
 
 
+def test_init():
+
+    # No SqlDB style
+    assert DotDict(
+        {
+            'b': {'a': None},
+            'c': {'a': 1},
+            'd': {'a': ''},
+            'e': {'a': {'b': 1}},
+            'f': {'a': [{'a': 1}, 1]},
+            'list': [1],
+            'set': set()}
+    ) == {'b': {'a': None}, 'c': {'a': 1}, 'd': {'a': ''}, 'e': {'a': {'b': 1}}, 'f': {'a': [{'a': 1}, 1]}, 'list': [1],
+          'set': set()}
+
+    # FlatDB style
+    assert DotDict() << {
+        "b.a": None,
+        'c.a': 1,
+        'd.a': "",
+        'e.a': {"b": 1},
+        'f.a': [{"a": 1}, 1],
+        "list": [1],
+        "set": set()
+    } == {'b': {'a': None}, 'c': {'a': 1}, 'd': {'a': ''}, 'e': {'a': {'b': 1}}, 'f': {'a': [{'a': 1}, 1]}, 'list': [1],
+          'set': set()}
+
+    # FlatDB style
+    assert DotDict() << [
+        ("b.a",  None),
+        ('c.a', 1),
+        ('d.a', ""),
+        ('e.a', {"b": 1}),
+        ('f.a', [{"a": 1}, 1]),
+        ("list", [1]),
+        ("set", set())
+    ] == {'b': {'a': None}, 'c': {'a': 1}, 'd': {'a': ''}, 'e': {'a': {'b': 1}}, 'f': {'a': [{'a': 1}, 1]}, 'list': [1],
+          'set': set()}
+
+
 def test_flat():
     data = DotDict({
         "b.a": None,
@@ -14,9 +54,11 @@ def test_flat():
         "list": [1],
         "set": set()
     }) << [
-        ('list[1]', 2)
-    ]
-    assert data.flat() == {'b.a': None, 'c.a': 1, 'd.a': '', 'e.a.b': 1, 'f.a': [{'a': 1}, 1], 'list': [1, 2], "set": set()}
+               ('list[1]', 2)
+           ]
+    assert data.flat() == {'b.a': None, 'c.a': 1, 'd.a': '', 'e.a.b': 1, 'f.a': [{'a': 1}, 1], 'list': [1, 2],
+                           "set": set()}
+
 
 def test_none():
     data = DotDict({
@@ -36,8 +78,8 @@ def test_none():
     assert data.empty('e')
     assert data.empty('f')
 
-
     assert not bool(DotDict())
+
 
 def test_first():
     a1 = {}
@@ -45,6 +87,7 @@ def test_first():
     data = DotDict({})
     data['a'] = first(lambda: a1["a"], lambda: a2["b"])
     assert data == {'a': 1}
+
 
 def test_map_key_value():
     data = DotDict()
@@ -62,6 +105,7 @@ def test_map_key_value():
         ("b_c", 'b.c')
     ] == {'a': 1, 'b_c': 2}
 
+
 def test_dotdict_deep_set():
     data = DotDict({})
     data['data.bookings[0].services[0].details.airline'] = 'Air France'
@@ -77,13 +121,13 @@ def test_dotdict_deep_set():
 
     data = DotDict({})
     data['data.list[0][0]'] = {1}
-    assert data == {'data': {"list":[[{1}]]}}
+    assert data == {'data': {"list": [[{1}]]}}
 
 
 def test_embedded_dotdict():
-    d= DotDict({
+    d = DotDict({
         "data": {
-            "list":[[1,2,3], [4,5,6], [7,8,9] ],
+            "list": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
             "bookings": [
                 {
                     "services": [
@@ -105,6 +149,7 @@ def test_embedded_dotdict():
     assert 'data.list[0][1]' in d
     assert d['data.list[0][1]'] == 2
 
+
 def test_dotdict_spread():
     d1 = DotDict({
         "a": "1"
@@ -115,6 +160,7 @@ def test_dotdict_spread():
 
     print({**d1, **d2})
 
+
 def test_dotdict_set_as_dotdict():
     d = DotDict({
         "a": "1"
@@ -124,7 +170,7 @@ def test_dotdict_set_as_dotdict():
         cd = DotDict(d)
 
     d = DotDict({"a": 1})
-    d['a'] = DotDict({"b": {"c": [2,1]}})
+    d['a'] = DotDict({"b": {"c": [2, 1]}})
     assert isinstance(d['a'], dict)
     assert d['a.b.c.0'] == 2
     assert d['a']['b']['c'][0] == 2
@@ -188,7 +234,6 @@ def test_dotdict_get_default():
     assert x is None
 
 
-
 def test_dotdict_has():
     d = {
         "a": {"b": ["c", 0]},
@@ -200,6 +245,7 @@ def test_dotdict_has():
     assert 'a[1].d' not in data
     assert 'a[]' not in data
     assert 'a.b[1]' in data
+
 
 def test_dotdict_set():
     data = DotDict({})
@@ -215,9 +261,16 @@ def test_dotdict_set():
 
 
 def test_equal():
-    x = DotDict({'id': '1', 'active': True, 'metadata': {'time': {'insert': '2025-01-10T17:13:28.620880+00:00', 'create': '2004-01-12T17:13:28.620880+00:00', 'update': '2025-03-20T10:53:41.924819+00:00'}}, 'operation': {'new': False, 'update': False}, 'ids': []})
-    y = DotDict({'id': '1', 'active': True, 'metadata': {'time': {'insert': '2025-01-10T17:13:28.620880+00:00', 'create': '2004-01-12T17:13:28.620880+00:00', 'update': '2025-03-20T10:53:41.924819+00:00'}}, 'operation': {'new': False, 'update': False}, 'ids': []})
+    x = DotDict({'id': '1', 'active': True, 'metadata': {
+        'time': {'insert': '2025-01-10T17:13:28.620880+00:00', 'create': '2004-01-12T17:13:28.620880+00:00',
+                 'update': '2025-03-20T10:53:41.924819+00:00'}}, 'operation': {'new': False, 'update': False},
+                 'ids': []})
+    y = DotDict({'id': '1', 'active': True, 'metadata': {
+        'time': {'insert': '2025-01-10T17:13:28.620880+00:00', 'create': '2004-01-12T17:13:28.620880+00:00',
+                 'update': '2025-03-20T10:53:41.924819+00:00'}}, 'operation': {'new': False, 'update': False},
+                 'ids': []})
     assert x == y
+
 
 # Define tests for invalid data paths
 def test_invalid_paths_handling():
