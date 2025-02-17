@@ -60,6 +60,12 @@ def test_flat():
                            "set": set()}
 
 
+
+def test_set_attrib():
+    data = DotDict()
+    with pytest.raises(KeyError):
+        data.atr = 1
+
 def test_none():
     data = DotDict({
         "b": None,

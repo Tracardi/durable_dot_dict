@@ -160,6 +160,11 @@ class DotDict(MutableMapping):
     def map(self, right: Union['DotDict', dict]) -> 'Mapper':
         return Mapper(self, right)
 
+    def __setattr__(self, key, value):
+        if key != 'root':
+            raise KeyError(f"Attribute `{key}` can not be set. DotDict can not be modified by setting attributes.")
+        super().__setattr__(key, value)
+
     def __contains__(self, item):
         keys = dotdict_parser.parse_unified_path(item)
         return self._has_reference(keys)
