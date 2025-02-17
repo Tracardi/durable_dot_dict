@@ -143,6 +143,9 @@ class DotDict(MutableMapping):
     def as_list(data: List[dict]) -> List['DotDict']:
         return list(map(DotDict, data))
 
+    def get_or_none(self, key: str) -> Optional[Any]:
+        return self.get(key, None)
+
     def empty(self, key) -> bool:
         result = self.get(key, None)
 
