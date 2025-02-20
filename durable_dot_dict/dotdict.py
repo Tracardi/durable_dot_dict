@@ -226,6 +226,8 @@ class DotDict(MutableMapping):
         return self
 
     def __rshift__(self, list_of_kv: List[Tuple[str, str]]) -> 'DotDict':
+        list_of_kv = list_of_kv.items() if isinstance(list_of_kv, dict) else list_of_kv
+
         dot = DotDict()
         for key, value in list_of_kv:
             dot[key] = self[value]
