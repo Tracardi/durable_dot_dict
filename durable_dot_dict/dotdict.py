@@ -1,9 +1,10 @@
 import copy
 import json
-from typing import Union, List, Tuple, Any, Optional, Dict, Set
+from typing import Union, List, Tuple, Any, Optional, Dict, Set, Type, TypeVar
 from collections.abc import MutableMapping
 import dotdict_parser
 
+T = TypeVar("T", bound='DotDict')
 
 class DotDict(MutableMapping):
     def __init__(self, dictionary: Optional[Union[dict | list]] = None):
@@ -118,6 +119,9 @@ class DotDict(MutableMapping):
         key = keys[-1]
         return path, key
 
+    def cast_to(self, cast_to: Type[T]) -> T:
+        return cast_to(self._root)
+
     def get(self, key, *args):
         try:
             keys = dotdict_parser.parse_unified_path(key)
@@ -230,6 +234,8 @@ class DotDict(MutableMapping):
 
         dot = DotDict()
         for key, value in list_of_kv:
+            if value not in self:
+                continue
             dot[key] = self[value]
         return dot
 

@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Iterable
+from typing import Any, Callable, List, Iterable, Type, Optional, Union
 from typing import Generator, Iterator, TypeVar
 from durable_dot_dict.dotdict import DotDict
 
@@ -26,15 +26,30 @@ def first_not_none(*args: Callable[[], Any]) -> Any:
     raise ValueError("All provided callables failed.")
 
 
-class FlatCollection:
-
+class DotDictStream:
     def __init__(self, collection: Iterable[T]):
         self.collection = collection
 
-    def __lshift__(self, other) -> Generator[T, None, None]:
-        for item in self.collection:
-            yield item << other
+    def __iter__(self):
+        yield from self.collection
 
-    def __rshift__(self, other) -> Generator[T, None, None]:
-        for item in self.collection:
-            yield item >> other
+    def __rshift__(self, other) -> 'DotDictStream':
+        return DotDictStream(item >> other for item in self.collection)
+
+    def __lshift__(self, other) -> 'DotDictStream':
+        return DotDictStream(item << other for item in self.collection)
+
+    def list(self, cast_to: Optional[Type[T]] = None) -> List[T]:
+        if cast_to is None:
+            return list(self.collection)
+        return [item.cast_to(cast_to) for item in self.collection]
+
+    def first(self, cast_to: Optional[Type[T]] = None) -> Optional[Union[T, DotDict]]:
+        try:
+            item = next(self.collection)
+
+            if cast_to is None:
+                return item
+            return item.cast_to(cast_to)
+        except StopIteration:
+            return None
