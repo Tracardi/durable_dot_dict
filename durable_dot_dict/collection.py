@@ -53,3 +53,7 @@ class DotDictStream:
             return item.cast_to(cast_to)
         except StopIteration:
             return None
+
+    def remap(self, mapping) -> Generator[DotDict, None, None]:
+        for item in self.collection:
+            yield item >> mapping
