@@ -224,7 +224,7 @@ class DotDict(MutableMapping):
         else:
             return False
 
-    def __lshift__(self, list_of_kv) -> 'DotDict':
+    def __lshift__(self, list_of_kv: Union[List[Tuple[str, str]], Dict[str,str]]) -> 'DotDict':
         list_of_kv = list_of_kv.items() if isinstance(list_of_kv, dict) else list_of_kv
 
         for key, value in list_of_kv:
@@ -232,7 +232,7 @@ class DotDict(MutableMapping):
 
         return self
 
-    def __rshift__(self, list_of_kv: List[Tuple[str, str]]) -> 'DotDict':
+    def __rshift__(self, list_of_kv: Union[List[Tuple[str, str]], Dict[str,str]]) -> 'DotDict':
         list_of_kv = list_of_kv.items() if isinstance(list_of_kv, dict) else list_of_kv
 
         dot = DotDict()
