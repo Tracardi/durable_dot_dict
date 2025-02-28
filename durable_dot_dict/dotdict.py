@@ -104,7 +104,10 @@ class DotDict(MutableMapping):
 
             elif key not in data:
                 return False
-            data = data[key]
+            try:
+                data = data[key]
+            except TypeError:
+                return False
         return True
 
     def _reference(self, keys):
