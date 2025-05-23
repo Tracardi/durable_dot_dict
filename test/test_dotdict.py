@@ -314,7 +314,14 @@ def test_get_or_none():
     assert cd | 'a' == {"b": ["c", 0]}
     assert cd | "none" is None
 
+def test_reference():
+    d = {
+        "a": None,
+    }
 
+    cd = DotDict(d)
+    assert 'a' in cd is True
+    assert 'a.b' in cd is False
 
 # Run all tests when executed via pytest
 if __name__ == "__main__":

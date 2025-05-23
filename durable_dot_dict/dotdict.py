@@ -90,6 +90,10 @@ class DotDict(MutableMapping):
         data = self._root
         last = len(keys) - 1
         for pos, key in enumerate(keys):
+
+            if data is None:
+                return False
+
             if isinstance(key, int):
                 # Is int but dat is not list
                 if not isinstance(data, list):
