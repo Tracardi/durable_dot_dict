@@ -242,6 +242,9 @@ class DotDict(MutableMapping):
             dot[key] = self[value]
         return dot
 
+    def __or__(self, property):
+        return self.get_or_none(property)
+
 def _data_convert(list_of_left_right):
     if isinstance(list_of_left_right, set):
         return [(item, item) for item in list_of_left_right]

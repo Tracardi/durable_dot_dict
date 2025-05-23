@@ -303,6 +303,19 @@ def test_invalid_paths_handling():
             _ = cd[path]
 
 
+def test_get_or_none():
+    d = {
+        "a": {"b": ["c", 0]},
+        "a3": {"b": ["c", 0, {"c"}, ("x", 10)]}
+    }
+
+    cd = DotDict(d)
+
+    assert cd | 'a' == {"b": ["c", 0]}
+    assert cd | "none" is None
+
+
+
 # Run all tests when executed via pytest
 if __name__ == "__main__":
     pytest.main()
