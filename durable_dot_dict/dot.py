@@ -19,8 +19,8 @@ class DotList(list):
             result = [d for d in result if d]
         return result
 
-    def merge(self) -> dict:
-        list = self.flatten()
+    def merge(self, allow: List[str] = None) -> dict:
+        list = self.flatten(allow)
         result = {}
         for item in list:
             result.update(item)
