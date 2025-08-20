@@ -1,4 +1,4 @@
-from typing import MutableMapping, Union
+from typing import MutableMapping, Union, List
 
 
 class DotList(list):
@@ -7,6 +7,16 @@ class DotList(list):
         if isinstance(value, dict):
             return Dot(value)
         return value
+
+    def flatten(self) -> List[dict]:
+        return [item.flat() for item in self]
+
+    def merge(self) -> dict:
+        list = self.flatten()
+        result = {}
+        for item in list:
+            result.update(item)
+        return result
 
 
 class Dot(dict):
