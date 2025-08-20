@@ -1,13 +1,16 @@
 import copy
 import json
+import logging
 from typing import Union, List, Tuple, Any, Optional, Dict, Set, Type, TypeVar
 from collections.abc import MutableMapping
 import dotdict_parser
 
 T = TypeVar("T", bound='DotDict')
+logger = logging.getLogger(__name__)
 
 class DotDict(MutableMapping):
-    def __init__(self, dictionary: Optional[Union[dict | list]] = None):
+    def __init__(self, dictionary: Optional[Union[dict | list]] = None, override_data=False):
+        self._override_data = override_data
         if dictionary is None:
             dictionary = {}
         if not isinstance(dictionary, (dict, list)):
@@ -25,14 +28,22 @@ class DotDict(MutableMapping):
         for i in range(len(path) - 1):
             key = path[i]
             next_key = path[i + 1]
+            prev_key = path[i - 1] if i > 0 else "root"
 
             if isinstance(key, str):
                 # Ensure `node` is a dict if we are using a string key
                 if not isinstance(node, dict):
-                    raise TypeError(f"Cannot use string key on non-dict: {node}")
+                    raise TypeError(f"Cannot embed key '{key}' in '{prev_key}' (path: {prev_key}.{key}) because it is not a dict but a string: {{{prev_key}:{node}}}")
+
                 # If key doesn't exist, create either a dict or list based on the next key
                 if key not in node:
                     node[key] = [] if isinstance(next_key, int) else {}
+                elif self._override_data:
+                    # key in node but not correct type
+                    if not isinstance(node[key], dict):
+                        logger.info(f"Path: {path} overrides old data, because '{key}' it is not a dict but a {type(node[key])} = {node[key]}")
+                        node[key] = [] if isinstance(next_key, int) else {}
+
                 node = node[key]
 
             elif isinstance(key, int):
@@ -58,7 +69,7 @@ class DotDict(MutableMapping):
         last_key = path[-1]
         if isinstance(last_key, str):
             if not isinstance(node, dict):
-                raise TypeError(f"Cannot assign string-key '{last_key}' to non-dict: {node}")
+                raise TypeError(f"Cannot change '{'.'.join(path)}' because some of nodes {path} are no-dict: {last_key}")
             node[last_key] = value
         elif isinstance(last_key, int):
             if not isinstance(node, list):
@@ -71,9 +82,7 @@ class DotDict(MutableMapping):
 
     def _set_reference(self, path, key):
         data = self._root
-        print(path)
         for item_no, item in enumerate(path):
-            print(item)
             if isinstance(item, int):
                 if not isinstance(data, list):
                     data = []

@@ -311,8 +311,8 @@ def test_get_or_none():
 
     cd = DotDict(d)
 
-    assert cd | 'a' == {"b": ["c", 0]}
-    assert cd | "none" is None
+    assert (cd | 'a') == {"b": ["c", 0]}
+    assert (cd | "none") is None
 
 def test_reference():
     d = {
@@ -320,9 +320,17 @@ def test_reference():
     }
 
     cd = DotDict(d)
-    assert 'a' in cd is True
-    assert 'a.b' in cd is False
+    assert ('a' in cd) is True
+    assert ('a.b' in cd) is False
+
+
+def test_error_handling():
+    # Cannot assign string-key 'email' to non-dict: http://localhost/1
+    d = DotDict({'name': 'http://localhost/1', "a": {"b": 1}}, override_data=True)
+    d['name.my'] = "test"
+    assert d['name.my'] == "test"
 
 # Run all tests when executed via pytest
 if __name__ == "__main__":
     pytest.main()
+
