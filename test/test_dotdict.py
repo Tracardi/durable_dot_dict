@@ -326,9 +326,9 @@ def test_reference():
 
 def test_error_handling():
     # Cannot assign string-key 'email' to non-dict: http://localhost/1
-    d = DotDict({'name': 'http://localhost/1', "a": {"b": 1}}, override_data=True)
-    d['name.my'] = "test"
-    assert d['name.my'] == "test"
+    d = DotDict({'name': 'http://localhost/1'}, override_data=False)
+    d['name.my'] = {"a":"test"}
+    assert d['name.my'] == {"a":"test"}
 
 # Run all tests when executed via pytest
 if __name__ == "__main__":

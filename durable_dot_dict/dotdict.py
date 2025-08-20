@@ -69,7 +69,7 @@ class DotDict(MutableMapping):
         last_key = path[-1]
         if isinstance(last_key, str):
             if not isinstance(node, dict):
-                raise TypeError(f"Cannot change '{'.'.join(path)}' because some of nodes {path} are no-dict: {last_key}")
+                raise TypeError(f"Cannot change '{'.'.join(path)}' because some of nodes {path} are no-dict: {last_key}. Set override_data=True (current:{self._override_data}) to allow this.")
             node[last_key] = value
         elif isinstance(last_key, int):
             if not isinstance(node, list):
