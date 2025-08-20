@@ -1,4 +1,4 @@
-from typing import MutableMapping, Union, List
+from typing import MutableMapping, Union, List, Any, Dict
 
 
 class DotList(list):
@@ -8,8 +8,16 @@ class DotList(list):
             return Dot(value)
         return value
 
-    def flatten(self) -> List[dict]:
-        return [item.flat() for item in self]
+    def flatten(self, allow: List[str] = None) -> List[Dict[str, Any]]:
+        result = [item.flat() for item in self]
+        if allow is not None:
+            result = [
+                {k: v for k, v in d.items() if k.startswith(tuple(allow))}
+                for d in result
+            ]
+            # remove empty dicts
+            result = [d for d in result if d]
+        return result
 
     def merge(self) -> dict:
         list = self.flatten()
