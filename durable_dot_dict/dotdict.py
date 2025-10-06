@@ -223,6 +223,7 @@ class DotDict(MutableMapping):
         return self._root
 
     def __setstate__(self, state):
+        self._override_data = False  # Use default value
         self._root = state
 
     def __iter__(self):
