@@ -9,12 +9,25 @@ T = TypeVar("T", bound='DotDict')
 logger = logging.getLogger(__name__)
 
 class DotDict(MutableMapping):
+
+    def __new__(cls, dictionary=None, override_data=False):
+        # If the input *is already* a DotDict, return it as-is
+        if isinstance(dictionary, DotDict):
+            return dictionary
+        return super().__new__(cls)
+
     def __init__(self, dictionary: Optional[Union[dict | list]] = None, override_data=False):
+
+        if isinstance(dictionary, DotDict):
+            return  # avoid re-initializing
+
         self._override_data = override_data
         if dictionary is None:
             dictionary = {}
+
         if not isinstance(dictionary, (dict, list)):
             raise TypeError(f"Expected dictionary or list as DotDict. Got {type(dictionary)}.")
+
         self._root = dictionary
 
     def _set_path_value(self, path, value):
