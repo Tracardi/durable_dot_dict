@@ -19,11 +19,17 @@ class DotList(list):
             result = [d for d in result if d]
         return result
 
-    def merge(self, allow: List[str] = None) -> dict:
+    def merge(self, allow: List[str] = None, allow_null_value:bool=True) -> dict:
         list = self.flatten(allow)
         result = {}
-        for item in list:
-            result.update(item)
+        if allow_null_value:
+            for item in list:
+                result.update(item)
+        else:
+            for item in list:
+                for k, v in item.items():
+                    if v is not None:
+                        result[k] = v
         return result
 
 
