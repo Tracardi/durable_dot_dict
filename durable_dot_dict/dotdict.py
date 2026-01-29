@@ -1,7 +1,7 @@
 import copy
 import json
 import logging
-from typing import Union, List, Tuple, Any, Optional, Dict, Set, Type, TypeVar
+from typing import Union, List, Tuple, Any, Optional, Dict, Set, Type, TypeVar, Callable
 from collections.abc import MutableMapping
 import dotdict_parser
 
@@ -255,6 +255,12 @@ class DotDict(MutableMapping):
         list_of_kv = list_of_kv.items() if isinstance(list_of_kv, dict) else list_of_kv
 
         for key, value in list_of_kv:
+            if isinstance(value, Callable) and key in self:
+                try:
+                    value = value(self[key])
+                except Exception as e:
+                    logger.error(f"Error while calling function for {key}: {e} in DotDict << operation.")
+                    value = '<transformation-error>'
             self[key] = value
 
         return self
