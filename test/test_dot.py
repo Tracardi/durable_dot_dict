@@ -12,4 +12,9 @@ def test_dot():
     print(dot.a.c[0].d)
     print(dot.a.c[0].e.x)
 
+def test_dot_dollar():
+    dotdict = DotDict({"!a": 1, "$b":  {"a": 3}})
+    assert dotdict['!a'] == 1
+    assert dotdict['$b.a'] == 3
+
 

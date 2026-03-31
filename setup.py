@@ -7,14 +7,14 @@ with open("README.md", "r",encoding="utf-8") as fh:
 
 setup(
     name='durable_dot_dict',
-    version='0.0.23',
+    version='0.0.24',
     description='Durable Dot Dictionary',
     long_description=long_description,
     long_description_content_type="text/markdown",
     author='Risto Kowaczewski',
     packages=['durable_dot_dict'],
     install_requires=[
-        'dotdict_parser'
+        'dotdict_parser>=0.8.1'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

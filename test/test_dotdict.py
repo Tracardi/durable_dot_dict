@@ -15,7 +15,8 @@ def test_init():
             'e': {'a': {'b': 1}},
             'f': {'a': [{'a': 1}, 1]},
             'list': [1],
-            'set': set()}
+            'set': set()
+        }
     ) == {'b': {'a': None}, 'c': {'a': 1}, 'd': {'a': ''}, 'e': {'a': {'b': 1}}, 'f': {'a': [{'a': 1}, 1]}, 'list': [1],
           'set': set()}
 
@@ -158,6 +159,35 @@ def test_embedded_dotdict():
     assert 'data.list[0][1]' in d
     assert d['data.list[0][1]'] == 2
 
+def test_special_sign_dotdict():
+    d = DotDict({
+        "$data": {
+            "list": [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+            "bookings": [
+                {
+                    "services": [
+                        {
+                            "details": {
+                                "airline": "Air France",
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "!alert": {
+            "a": 1
+        }
+    })
+
+    assert d['$data.bookings[0].services[0].details.airline'] == 'Air France'
+    assert '$data.bookings[1].services[0]' not in d
+    assert '$data.bookings[0].services[0]' in d
+    assert '$data.bookings[0].services' in d
+    assert '$data.list[0][1]' in d
+    assert d['$data.list[0][1]'] == 2
+    assert d['!alert.a'] == 1
+
 
 def test_dotdict_spread():
     d1 = DotDict({
@@ -174,9 +204,6 @@ def test_dotdict_set_as_dotdict():
     d = DotDict({
         "a": "1"
     })
-
-    with pytest.raises(TypeError):
-        cd = DotDict(d)
 
     d = DotDict({"a": 1})
     d['a'] = DotDict({"b": {"c": [2, 1]}})
@@ -330,8 +357,8 @@ def test_reference():
 def test_error_handling():
     # Cannot assign string-key 'email' to non-dict: http://localhost/1
     d = DotDict({'name': 'http://localhost/1'}, override_data=False)
-    d['name.my'] = {"a":"test"}
-    assert d['name.my'] == {"a":"test"}
+    with pytest.raises(TypeError):
+        d['name.my'] = {"a":"test"}
 
 # Run all tests when executed via pytest
 if __name__ == "__main__":
